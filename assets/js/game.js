@@ -57,7 +57,72 @@ var snake, apple, squareSize, score, speed,
   update: function() {
     // The update function is called constantly at a high rate (somewhere around 60fps),
     // updating the game field every time.
-    // We are going to leave that one empty for now.
+    // Handle arrow key presses, while not allowing illegal direction changes that will kill the player.
+
+    if (cursors.right.isDown && direction!='left')
+    {
+      new_direction = 'right';
+    }
+    else if (cursors.left.isDown && direction!='right')
+    {
+      new_direction = 'left';
+    }
+    else if (cursors.up.isDown && direction!='down')
+    {
+      new_direction = 'up';
+    }
+    else if (cursors.down.isDown && direction!='up')
+    {
+      new_direction = 'down';
+    }
+
+    // A formula to calculate game speed based on the score.
+    // The higher the score, the higher the game speed, with a maximum of 10;
+    speed = Math.min(10, Math.floor(score/5));
+    // Update speed value on game screen.
+    speedTextValue.text = '' + speed;
+
+    // Do game stuff only if the counter is aliquot to (10 - the game speed).
+    // The higher the speed, the more frequently this is fulfilled,
+    // making the snake move faster.
+    if (updateDelay % (10 - speed) == 0) {
+      // Snake movement
+
+      var firstCell = snake[snake.length - 1],
+          lastCell = snake.shift(),
+          oldLastCellx = lastCell.x,
+          oldLastCelly = lastCell.y;
+
+      if (new_direction){
+        direction = new_direction;
+        new_direction = null;
+      }
+
+      // Change the last cell's coordinates relative to the head of the snake, according to the direction.
+
+      if(direction == 'right'){
+        lastCell.x = firstCell.x + 15;
+        lastCell.y = firstCell.y;
+      }
+      else if(direction == 'left'){
+        lastCell.x = firstCell.x - 15;
+        lastCell.y = firstCell.y;
+      }
+      else if(direction == 'up'){
+        lastCell.x = firstCell.x;
+        lastCell.y = firstCell.y - 15;
+      }
+      else if(direction == 'down'){
+        lastCell.x = firstCell.x;
+        lastCell.y = firstCell.y + 15;
+      }
+
+      // Place the last cell in the front of the stack.
+      // Mark it the first cell.
+      snake.push(lastCell);
+      firstCell = lastCell;
+    }
+
   },
 
   generateApple: function(){
@@ -73,4 +138,4 @@ var snake, apple, squareSize, score, speed,
     apple = game.add.sprite(randomX, randomY, 'apple');
   }
 
-}; // end's game state 
+}; // end's game state
